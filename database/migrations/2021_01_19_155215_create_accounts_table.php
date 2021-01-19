@@ -14,8 +14,8 @@ class CreateAccountsTable extends Migration
     public function up()
     {
         Schema::create('accounts', function (Blueprint $table) {
-            $table->uuid("id")->index();
-            $table->string("user_email");
+            $table->uuid("id")->primary();
+            $table->string("user_email")->index();
             $table->string("account_name");
             $table->string("account_number",12)->unique();
             $table->string("alternate_email")->nullable();
