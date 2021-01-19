@@ -11,15 +11,18 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    public function account(){
+
+        return $this->hasOne(Account::class, "email","email");
+    }
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
+    protected $guarded = [
+        'id'
     ];
 
     /**
