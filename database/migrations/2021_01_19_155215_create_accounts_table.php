@@ -14,13 +14,15 @@ class CreateAccountsTable extends Migration
     public function up()
     {
         Schema::create('accounts', function (Blueprint $table) {
-            $table->id();
-            $table->string("email");
+            $table->uuid("id")->index();
+            $table->string("user_email");
             $table->string("account_name");
             $table->string("account_number",12)->unique();
+            $table->string("alternate_email")->nullable();
+            $table->string("phone_number")->nullable();
             $table->enum("account_type",["Savings","Current"])->default("Savings");
             $table->decimal("account_balance",10,2);
-            $table->foreign("id")->references("account_id")->on("transactions")->onDelete("cascade");
+            $table->foreign("user_email")->references("email")->on("users")->onDelete("cascade");
             $table->timestamps();
         });
     }

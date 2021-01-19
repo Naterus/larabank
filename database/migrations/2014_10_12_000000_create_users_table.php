@@ -19,7 +19,6 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->tinyInteger('status')->default(1);
-            $table->foreign("email")->references("email")->on("accounts")->onDelete("cascade");
             $table->rememberToken();
             $table->timestamps();
         });
