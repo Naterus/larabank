@@ -141,9 +141,9 @@
             <label>Confirm Account Password</label>
             <input name="password_confirmation" type="password" class="form-control" required="required">
         </div>
-        <input type="submit" class="btn btn-primary btn-block btn-lg" value="Login">
+        <input type="submit" class="btn btn-primary btn-block btn-lg" value="Submit">
     </form>
-    <div class="text-center small">Don't have an account? <a href="{{ route('home') }}">Sign up</a></div>
+    <div class="text-center small">Don't have an account? <a href="{{ route('home') }}">Login</a></div>
 </div>
 </body>
 </html>
