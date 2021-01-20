@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Account;
+use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Auth;
 
 class AuthController extends Controller
@@ -34,50 +35,42 @@ class AuthController extends Controller
 
         $account_number = $this->accountNumberGenerator(10);
         $bonus = 20000;
-        $find_existing_account = Account::where("account_number",$account_number)->count();
+        $find_existing_account_number = Account::where("account_number",$account_number)->count();
 
-        while($find_existing_account > 0) {
+        if($find_existing_account_number > 0) {
             //Call function recursively when generated account number already exists.
             $this->createAccount($request);
         }
 
-        DB::beginTransaction();
-
         try {
 
             //Create Login Profile
-            $create_user = DB::table("users")->insert([
+            $create_user = User::create([
                 "email" => $request->input("email"),
                 "password" => bcrypt($request->input("password")),
             ]);
 
             //Create Account
-            $create_account = DB::table("accounts")->insert([
+            $create_account = Account::create([
                 "account_name" => $request->input("account_name"),
                 "account_number" => $account_number,
                 "account_type" => $request->input("account_type"),
                 "account_balance" => $bonus,
                 "phone_number" => $request->input("phone_number"),
-                "user_email" => $request->input("email")
+                "user_email" => $create_user->email
             ]);
 
-            //
-            DB::commit();
-
-
             //Create New transaction record for bonus credit
-            DB::table("transactions")->insert([
+            Transaction::create([
                 "transaction_type" => "Credit",
                 "transaction_description" => "@Signup Bonus / Credit / @LaraBank",
                 "transaction_amount" => $bonus,
                 "account_id" => $create_account->id
             ]);
 
-            DB::commit();
         }
-        catch (\Exception $e) {
 
-            DB::rollback();
+        catch (\Exception $e) {
 
             return $e;
         }
