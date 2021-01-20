@@ -97,17 +97,30 @@
 </head>
 <body>
 <div class="login-form">
-    <form action="/examples/actions/confirmation.php" method="post">
+    <form action="{{ route('login.attempt') }}" method="post">
         <div class="avatar"><i class="material-icons">&#xe84f;</i></div>
         <h1 class="modal-title">Lara<span class="text-danger">Bank</span></h1>
         <h3>Login Account</h3>
+        @if(Session::has('error'))
+            <div class="alert alert-danger text-center">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <strong>{!! Session::get('error') !!}</strong>
+            </div>
+        @endif
+        @if(Session::has('errors'))
+            <div class="alert alert-danger text-center">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <strong>{!! $errors->first()!!}</strong>
+            </div>
+        @endif
+        <input name="_token" value="{{ csrf_token() }}" hidden>
         <div class="form-group">
             <label>Email Address</label>
-            <input type="text" class="form-control" placeholder="Email Address" required="required">
+            <input name="email" type="text" class="form-control"  required="required">
         </div>
         <div class="form-group">
             <label>Account Password</label>
-            <input type="password" class="form-control"  required="required">
+            <input name="password" type="password" class="form-control"  required="required">
         </div>
 
         <input type="submit" class="btn btn-primary btn-block btn-lg" value="Login">

@@ -19,6 +19,8 @@ use App\Http\Controllers\AccountController;
 
 Route::get("/",[HomeController::class,'index'])->name("home");
 
+Route::post("/login-attempt",[AuthController::class,'loginAccount'])->name("login.attempt");
+
 Route::get("/register",[HomeController::class,'register'])->name("register");
 
 Route::post("/register/create-account",[AuthController::class,'createAccount'])->name("register.submit");
@@ -28,3 +30,5 @@ Route::get("/account/dashboard",[AccountController::class,'dashboard'])->name("a
 Route::get("/account/transfer-funds",[AccountController::class,'transferFunds'])->name("account.transfer");
 
 Route::post("/account/transfer-funds/submit",[AccountController::class,'submitTransfer'])->name("account.transfer.submit");
+
+Route::get("/account/logout",[AuthController::class,'logout'])->name("account.logout");

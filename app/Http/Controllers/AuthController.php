@@ -86,4 +86,32 @@ class AuthController extends Controller
 
     }
 
+    public function loginAccount(Request $request) {
+
+        $this->validate($request,[
+            "email" => "required|email",
+            "password" => "required"
+        ]);
+
+
+        if ( Auth::attempt ([
+            "email" => $request->input("email"),
+            "password" => $request->input("password"),
+            "status" => 1,
+        ])) {
+
+            return redirect()->route('account.dashboard');
+
+        }
+        else {
+            return redirect()->back()->with(["error" => "Email or password incorrect."]);
+        }
+    }
+
+    public function logout(){
+        Auth::logout();
+
+        return redirect()->route("home");
+    }
+
 }
