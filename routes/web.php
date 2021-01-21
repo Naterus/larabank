@@ -25,6 +25,10 @@ Route::get("/register",[HomeController::class,'register'])->name("register");
 
 Route::post("/register/create-account",[AuthController::class,'createAccount'])->name("register.submit");
 
+Route::get("/account",[AccountController::class,'account'])->name("account");
+
+Route::post("/account/update",[AccountController::class,'updateAccount'])->name("account.update");
+
 Route::get("/account/dashboard",[AccountController::class,'dashboard'])->name("account.dashboard");
 
 Route::get("/account/transfer-funds",[AccountController::class,'transferFunds'])->name("account.transfer");

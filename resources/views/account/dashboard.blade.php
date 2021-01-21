@@ -5,16 +5,16 @@
     <div class="row">
         <div class="col-md-6 col-sm-6 col-lg-6">
             <div class="panel panel-default text-center">
-                <div class="panel-heading">Balance</div>
                 <div class="panel-body">
+                    <h3>Balance</h3>
                     <h1>${{ number_format(Auth::user()->account->account_balance) }}</h1>
                 </div>
             </div>
         </div>
         <div class="col-md-6 col-sm-6 col-lg-6">
             <div class="panel panel-default text-center">
-                <div class="panel-heading">Transactions</div>
                 <div class="panel-body">
+                    <h3>Transactions</h3>
                     <h1>{{ Auth::user()->account->transactions->count() }}</h1>
                 </div>
             </div>

@@ -10,6 +10,29 @@ use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
+    public function account(){
+        return view("account.account");
+    }
+
+    public function updateAccount(Request $request){
+        $this->validate($request,[
+            "account_name" => "required|string|min:6|max:80",
+            "account_type" => "required",
+            "phone_number" => "required|min:10|max:11",
+            "alternate_email" => "min:8",
+        ]);
+
+        Account::where("user_email",Auth::user()->email)->update([
+            "account_name" => $request->input("account_name"),
+            "account_type" => $request->input("account_type"),
+            "phone_number" => $request->input("phone_number"),
+            "alternate_email" => $request->input("alternate_email")
+        ]);
+
+        return redirect()->back()->with("success","Account updated successfully");
+
+    }
+
     public function dashboard(){
         return view("account.dashboard");
     }
