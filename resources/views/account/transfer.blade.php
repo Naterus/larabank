@@ -6,7 +6,7 @@
             <div class="panel panel-default text-center">
                 <div class="panel-heading">Transfer Funds</div>
                 <div class="panel-body">
-                    <h3 class="text-info">Balance ${{ number_format(Auth::user()->account->account_balance) }}</h3>
+                    <h3 class="text-info">Balance &#8358;{{ number_format(Auth::user()->account->account_balance) }}</h3>
                     @if(Session::has('error'))
                         <div class="alert alert-danger text-center">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -32,7 +32,7 @@
                             <input name="account_number" type="text" class="form-control" placeholder="71**********" required="required">
                         </div>
                         <div class="form-group">
-                            <label>Amount</label>
+                            <label>Amount (&#8358;)</label>
                             <input name="amount" type="number" class="form-control"  value="0.00" required="required">
                         </div>
 

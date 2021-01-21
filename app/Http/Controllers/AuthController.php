@@ -63,7 +63,7 @@ class AuthController extends Controller
             //Create New transaction record for bonus credit
             Transaction::create([
                 "transaction_type" => "Credit",
-                "transaction_description" => "@Signup Bonus / Credit / @LaraBank",
+                "transaction_description" => "@Signup Bonus / Credit / @Larabank",
                 "transaction_amount" => $bonus,
                 "account_id" => $create_account->id
             ]);
@@ -82,7 +82,7 @@ class AuthController extends Controller
             "status" => 1,
         ]);
 
-        return redirect()->route("account.dashboard")->with("success","Welcome, You were credited with $".$bonus." for free.");
+        return redirect()->route("account.dashboard")->with("success","Welcome ".strtok(trim(Auth::user()->account->account_name), ' ').", You were credited with &#8358;".number_format($bonus)." as bonus from larabank.");
 
     }
 

@@ -62,7 +62,7 @@ class AccountController extends Controller
         if($amount < $minimum_transfer){
 
             return redirect()->back()->with([
-                "error" => "Can not transfer less than ".$minimum_transfer.". Transaction declined."
+                "error" => "Can not transfer less than &#8358;".$minimum_transfer.". Transaction declined."
             ]);
         }
 
@@ -141,7 +141,7 @@ class AccountController extends Controller
         if($amount < $min_purchase){
 
             return redirect()->back()->with([
-                "error" => "Can not purchase airtime less than ". $min_purchase . ". Transaction declined."
+                "error" => "Can not purchase airtime less than &#8358;". $min_purchase . ". Transaction declined."
             ]);
         }
 

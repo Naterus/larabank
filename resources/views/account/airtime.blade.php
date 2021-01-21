@@ -38,7 +38,7 @@
                             <input name="phone_number" type="text" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label>Airtime Amount</label>
+                            <label>Airtime Amount (&#8358;)</label>
                             <input name="amount" type="number" class="form-control" value="0" required>
                         </div>
 

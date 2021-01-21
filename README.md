@@ -1,62 +1,138 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+<p align="center"><a href="https://restfulcountries.com" target="_blank"><img src="https://restfulcountries.com/assets/images/larabank/login.png" width="300"></a></p>
 
 <p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+
+<a href="https://github.com/Naterus/restful-countries/blob/main/LICENSE"><img src="https://restfulcountries.com/assets/images/license-mit.svg" alt="License"></a>
 </p>
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Larabank is a simple bank app built with laravel to illustrate the real life occurrence of race conditions in software systems and how it can be handled using pessimistic lock. 
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Assuming you have an account balance of 5,000 and you try to perform a transfer of 5,000 on larabank, meanwhile you have a friend using your atm card to withdraw 5,000 at the same time. at this point two separate transactions are trying to execute on one account which is known as race condition. If this is not handled, both would perform transaction successfully leaving larabank with a loss of 5,000.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+In this case, using only if statements won't help as both parties would access the current data at the same time, and the account balance check would pass for both. Therefore, any transaction that has to do with a debit should be locked to the first user that accesses the data using pessimistic lock strategy.
 
-## Learning Laravel
+#Larabank Transfer Example
+```angular2html
+  DB::beginTransaction();
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+        try {
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+            //Initiate exclusive lock for first user to access this record
+            $check_balance = Account::where("user_email", Auth::user()->email)
+                ->where("account_balance", ">", $amount)->lockForUpdate()
+                ->first();
 
-## Laravel Sponsors
+            if (!$check_balance) {
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+                return redirect()->back()->with([
+                    "error" => "Insufficient Funds!, Transaction declined."
+                ]);
+            }
 
-### Premium Partners
+            //sleep(40); //delay script to test lock on incognito tab
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/)**
-- **[OP.GG](https://op.gg)**
+            //Debit from account
+            $check_balance->account_balance = $check_balance->account_balance - $amount;
+            $check_balance->save();
 
-## Contributing
+            //Add debit to transactions
+            Transaction::create([
+                "transaction_type" => "Debit",
+                "transaction_description" => "@Transfer / Debit / @" . $account_number,
+                "transaction_amount" => $amount,
+                "account_id" => Auth::user()->account->id
+            ]);
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+            //Credit Beneficiary account as well.
 
-## Code of Conduct
+            DB::commit();
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+            return redirect()->back()->with([
+                "success" => "Transaction Successful!."
+            ]);
 
-## Security Vulnerabilities
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+The most important part of that code is the `$check_balance` line where you chain the query with lockForUpdate(). This is where the pessimistic lock is applied on the database. Any other user trying to update that row would be blocked until the transaction commits successfully  or fails and rollback.
+
+## Screen
+
+`Dashboard`
+<p><img src="https://restfulcountries.com/assets/images/larabank/dashboard.png" width="320"></p>
+
+Since functionality is the key feature of larabank, a very basic bootstrap design was used for the user interface. Run the application using the instructions below to see other screens and how it works.
+
+## Running Locally
+Larabank is built with Laravel Framework 8.18.1 which would require [PHP](https://php.net) 7.4+ to run smoothly.
+
+1. Open your terminal and `cd` to any directory of your choice
+    ```bash
+    cd your-directory
+   ```
+2. Clone this repository
+    ```bash
+    git clone https://github.com/Naterus/larabank.git
+    ```
+3. `cd` into the folder created for cloned project:
+    ```bash
+    cd larabank
+   ```
+
+4. Install packages with composer
+    ```bash
+    composer install
+   ```
+
+5. Make a copy of .env.example as .env
+    ```bash
+    cp .env.example .env
+   ```
+
+6. Generate app key
+    ```bash
+    php artisan key:generate
+   ```
+
+7. Create an empty database and add the database credentials to `.env` file
+    ```angular2html
+        DB_DATABASE=your_database_name
+        DB_USERNAME=root
+        DB_PASSWORD=your_password
+   ```
+
+8. Run migration
+   ```bash
+   php artisan migrate
+   ```
+9. Start laravel local server
+   ```bash
+    php artisan serve
+    ```
+
+10. open http://127.0.0.1:8000/ in your browser, You should see larabank login page.
+
+## Todo
+Project based learning is very effective in learning software development, if you are looking for a project to improve your skill regardless the technology, you can use this project as a starting point and improve on it. Here are some few things i feel can be added to make it awesome.
+- Implement two-factor authentication to enhance security
+- Implement API - create api endpoints for mobile app to consume.
+- Implement Password reset
+- Implement Account Activation on sign up.
+- Add beneficiaries - Enable bank user manage beneficiaries and only transfer to existing bank accounts.
+- Multiple account management - allow users create and manage multiple bank accounts using their email address, I created a roadmap for that already by separating the user model from the account model. they sign up with email and then create and manage different bank accounts when logged in. This is quite advanced though as you are looking at building a SaaS like banking app and would require advanced security.
+- Loans - allow users request for loans, and they pay back with interest.
+- Withdrawal - Simulate atm withdrawal
+- Deposit - Simulate bank deposit
+- Pension - create pension plan for people with current accounts
+- Implement admin portal - Enable administrators perform operations like approve loans , pension , deposits , etc based on roles. 
+- Account type restriction - restrict account operations based on account type.
+
+And many more.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Licensed under the [MIT license](https://opensource.org/licenses/MIT).
