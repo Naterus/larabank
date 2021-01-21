@@ -12,7 +12,9 @@ Assuming you have an account balance of 5,000 and you try to perform a transfer 
 
 In this case, using only if statements won't help as both parties would access the current data at the same time, and the account balance check would pass for both. Therefore, any transaction that has to do with a debit should be locked to the first user that accesses the data using pessimistic lock strategy.
 
-#Larabank Transfer Example
+Race conditions occur in split seconds, and this can cause a terrible glitch in software systems. examples include double booking of plane tickets, concerts, e-commerce limited product sale and so on.
+
+##Larabank Transfer Example
 ```angular2html
   DB::beginTransaction();
 
@@ -29,8 +31,6 @@ In this case, using only if statements won't help as both parties would access t
                     "error" => "Insufficient Funds!, Transaction declined."
                 ]);
             }
-
-            //sleep(40); //delay script to test lock on incognito tab
 
             //Debit from account
             $check_balance->account_balance = $check_balance->account_balance - $amount;
@@ -60,7 +60,6 @@ In this case, using only if statements won't help as both parties would access t
 
 The most important part of that code is the `$check_balance` line where you chain the query with lockForUpdate(). This is where the pessimistic lock is applied on the database. Any other user trying to update that row would be blocked until the transaction commits successfully  or fails and rollback.
 
-To verify that this works, uncomment the `//sleep(40);` by removing both forward slash before the sleep, login account and go to transfer page, Then open another incognito tab and do the same. You should have two transfer pages opened, Initiate transfer on the first page with the exact amount of your current balance. while it loads, go to the incognito page and initiate another transfer, When both pages are done loading, the second page should return insufficient funds while the first should be successful. 
 ## Screen
 
 `Dashboard`

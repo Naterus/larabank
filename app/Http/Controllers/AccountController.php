@@ -72,7 +72,7 @@ class AccountController extends Controller
 
             //Initiate exclusive lock for first user to access this record
             $check_balance = Account::where("user_email", Auth::user()->email)
-                ->where("account_balance", ">", $amount)->lockForUpdate()
+                ->where("account_balance", ">", $amount)
                 ->first();
 
             if (!$check_balance) {
@@ -81,8 +81,6 @@ class AccountController extends Controller
                     "error" => "Insufficient Funds!, Transaction declined."
                 ]);
             }
-
-            //sleep(40); //delay script to test lock on incognito tab
 
             //Debit from account
             $check_balance->account_balance = $check_balance->account_balance - $amount;
