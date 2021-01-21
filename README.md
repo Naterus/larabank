@@ -6,15 +6,15 @@
 </p>
 
 
-Larabank is a simple bank app built with laravel to illustrate the real life occurrence of race conditions in software systems and how it can be handled using pessimistic lock. 
+Larabank is a simple bank app built with laravel to illustrate real life occurrence of race conditions in software systems and how it can be handled using pessimistic lock. 
 
-Assuming you have an account balance of 5,000 and you try to perform a transfer of 5,000 on larabank, meanwhile you have a friend using your atm card to withdraw 5,000 at the same time. at this point two separate transactions are trying to execute on one account which is known as race condition. If this is not handled, both would perform transaction successfully leaving larabank with a loss of 5,000.
+Assuming you have an account balance of 5,000 and you try to perform a transfer of 5,000 on larabank, meanwhile you have a friend using your atm card to withdraw 5,000 at the same time. at this point two separate transactions are trying to execute on one account which is known as race condition. If this is not handled, both would perform transaction successfully, leaving larabank with a loss of 5,000.
 
 In this case, using only if statements won't help as both parties would access the current data at the same time, and the account balance check would pass for both. Therefore, any transaction that has to do with a debit should be locked to the first user that accesses the data using pessimistic lock strategy.
 
 Race conditions occur in split seconds, and this can cause a terrible glitch in software systems. examples include double booking of plane tickets, concerts, e-commerce limited product sale and so on.
 
-##Larabank Transfer Example
+## Larabank Transfer Example
 ```angular2html
   DB::beginTransaction();
 
