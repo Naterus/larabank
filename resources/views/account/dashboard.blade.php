@@ -11,6 +11,8 @@
             </div>
         </div>
     @endif
+    <h3>Account Number : <span class="text-info">{{ Auth::user()->account->account_number }}</span> </h3>
+
     <div class="row">
         <div class="col-md-6 col-sm-6 col-lg-6">
             <div class="panel panel-default text-center">
@@ -29,6 +31,8 @@
             </div>
         </div>
     </div>
+
+
 
     <h3>Transactions</h3>
 

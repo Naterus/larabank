@@ -51,13 +51,20 @@ class AccountController extends Controller
         $amount = $request->input("amount");
         $minimum_transfer = 100; //used to determine minimum transfer amount allowed.
         $account_number = $request->input("account_number");
-        $pattern =  substr($account_number,0,2);
+        $beneficiary_account = Account::where("account_number",$account_number)->first();
 
-        if($pattern != 71){
+        if(!$beneficiary_account){
             return redirect()->back()->with([
                 "error" => "Invalid account number. please enter a valid 12 digit account number starting with 71."
             ]);
         }
+
+        if($account_number == Auth::user()->account->account_number){
+            return redirect()->back()->with([
+                "error" => "Cannot transfer to self. Transaction declined"
+            ]);
+        }
+
 
         if($amount < $minimum_transfer){
 
@@ -86,16 +93,28 @@ class AccountController extends Controller
             $check_balance->account_balance = $check_balance->account_balance - $amount;
             $check_balance->save();
 
+            //Credit Beneficiary account
+            $beneficiary_account->account_balance = $beneficiary_account->account_balance + $amount;
+            $beneficiary_account->save();
+
             //Add debit to transactions
             Transaction::create([
                 "transaction_type" => "Debit",
-                "transaction_description" => "@Transfer / Debit / @" . $account_number,
+                "transaction_description" => "@Transfer / Debit / @" . $beneficiary_account->account_name,
                 "transaction_amount" => $amount,
                 "account_id" => Auth::user()->account->id
             ]);
 
-            //Credit Beneficiary account as well.
+            //Add credit to transactions
+            Transaction::create([
+                "transaction_type" => "Credit",
+                "transaction_description" => "@Transfer / Credit / @" . Auth::user()->account->account_name,
+                "transaction_amount" => $amount,
+                "account_id" => $beneficiary_account->id
+            ]);
 
+
+            //Explicitly commit transaction
             DB::commit();
 
             return redirect()->back()->with([
@@ -170,6 +189,9 @@ class AccountController extends Controller
                 "account_id" => Auth::user()->account->id
             ]);
 
+            //Send airtime using some api
+
+            //Explicitly commit transaction
             DB::commit();
 
             return redirect()->back()->with([

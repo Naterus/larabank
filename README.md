@@ -15,14 +15,14 @@ In this case, using only if statements won't help as both parties would access t
 Race conditions occur in split seconds, and this can cause a terrible glitch in software systems. examples include double booking of plane tickets, concerts, e-commerce limited product sale and so on.
 
 ## Larabank Transfer Example
-```angular2html
-  DB::beginTransaction();
+```injectablephp
+       DB::beginTransaction();
 
         try {
 
             //Initiate exclusive lock for first user to access this record
             $check_balance = Account::where("user_email", Auth::user()->email)
-                ->where("account_balance", ">=", $amount)->lockForUpdate()
+                ->where("account_balance", ">=", $amount)
                 ->first();
 
             if (!$check_balance) {
@@ -36,16 +36,28 @@ Race conditions occur in split seconds, and this can cause a terrible glitch in 
             $check_balance->account_balance = $check_balance->account_balance - $amount;
             $check_balance->save();
 
+            //Credit Beneficiary account
+            $beneficiary_account->account_balance = $beneficiary_account->account_balance + $amount;
+            $beneficiary_account->save();
+
             //Add debit to transactions
             Transaction::create([
                 "transaction_type" => "Debit",
-                "transaction_description" => "@Transfer / Debit / @" . $account_number,
+                "transaction_description" => "@Transfer / Debit / @" . $beneficiary_account->account_name,
                 "transaction_amount" => $amount,
                 "account_id" => Auth::user()->account->id
             ]);
 
-            //Credit Beneficiary account as well.
+            //Add credit to transactions
+            Transaction::create([
+                "transaction_type" => "Credit",
+                "transaction_description" => "@Transfer / Credit / @" . Auth::user()->account->account_name,
+                "transaction_amount" => $amount,
+                "account_id" => $beneficiary_account->id
+            ]);
 
+
+            //Explicitly commit transaction
             DB::commit();
 
             return redirect()->back()->with([
@@ -58,7 +70,7 @@ Race conditions occur in split seconds, and this can cause a terrible glitch in 
         }
 ```
 
-The most important part of that code is the `$check_balance` line where you chain the query with lockForUpdate(). This is where the pessimistic lock is applied on the database. Any other user trying to update that row would be blocked until the transaction commits successfully  or fails and rollback.
+The most important part of the code above is the `$check_balance` line where you chain the query with lockForUpdate(). This is where the pessimistic lock is applied on the database. Any other user trying to update that row would be blocked until the transaction commits successfully  or fails and rollback.
 
 ## Screen
 
