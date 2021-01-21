@@ -72,7 +72,7 @@ class AccountController extends Controller
 
             //Initiate exclusive lock for first user to access this record
             $check_balance = Account::where("user_email", Auth::user()->email)
-                ->where("account_balance", ">", $amount)
+                ->where("account_balance", ">=", $amount)
                 ->first();
 
             if (!$check_balance) {
@@ -148,7 +148,7 @@ class AccountController extends Controller
         try {
 
             $check_balance = Account::where("user_email", Auth::user()->email)
-                ->where("account_balance", ">", $amount)->lockForUpdate()
+                ->where("account_balance", ">=", $amount)->lockForUpdate()
                 ->first();
 
             if (!$check_balance) {
