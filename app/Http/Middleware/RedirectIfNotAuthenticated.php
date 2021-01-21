@@ -7,14 +7,13 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class RedirectIfAuthenticated
+class RedirectIfNotAuthenticated
 {
     /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string|null  ...$guards
      * @return mixed
      */
     public function handle(Request $request, Closure $next, ...$guards)
@@ -23,10 +22,10 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::DASHBOARD);
+                return $next($request);
             }
         }
 
-        return $next($request);
+        return redirect(RouteServiceProvider::HOME);
     }
 }
