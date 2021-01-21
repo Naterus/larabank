@@ -35,4 +35,8 @@ Route::get("/account/transfer-funds",[AccountController::class,'transferFunds'])
 
 Route::post("/account/transfer-funds/submit",[AccountController::class,'submitTransfer'])->name("account.transfer.submit");
 
+Route::get("/account/airtime",[AccountController::class,'airtime'])->name("account.airtime");
+
+Route::post("/account/airtime/purchase",[AccountController::class,'purchaseAirtime'])->name("account.airtime.purchase");
+
 Route::get("/account/logout",[AuthController::class,'logout'])->name("account.logout");

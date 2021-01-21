@@ -22,6 +22,9 @@
             <a class="nav-link" href="{{ route('account.transfer') }}">Send Money</a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" href="{{ route('account.airtime') }}">Buy Airtime</a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" href="{{ route('account') }}">Account</a>
         </li>
         <li class="nav-item">
@@ -30,5 +33,6 @@
     </ul>
     @yield("page-content")
 </div>
+@yield("page-script")
 </body>
 </html>

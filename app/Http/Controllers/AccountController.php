@@ -49,12 +49,20 @@ class AccountController extends Controller
         ]);
 
         $amount = $request->input("amount");
+        $minimum_transfer = 100; //used to determine minimum transfer amount allowed.
         $account_number = $request->input("account_number");
         $pattern =  substr($account_number,0,2);
 
         if($pattern != 71){
             return redirect()->back()->with([
                 "error" => "Invalid account number. please enter a valid 12 digit account number starting with 71."
+            ]);
+        }
+
+        if($amount < $minimum_transfer){
+
+            return redirect()->back()->with([
+                "error" => "Can not transfer less than ".$minimum_transfer.". Transaction declined."
             ]);
         }
 
@@ -100,5 +108,82 @@ class AccountController extends Controller
             DB::rollBack();
             throw $e;
         }
+    }
+
+    public function airtime(){
+        return view("account.airtime");
+    }
+
+    public function purchaseAirtime(Request $request){
+        $this->validate($request,[
+            "beneficiary" => "required",
+            "amount" => "required"
+        ]);
+
+        $phone_number = null;
+        $min_purchase = 100; //used to determine lowest airtime purchase allowed
+        $amount = $request->input("amount");
+
+        if($request->input("beneficiary") == "self"){
+
+            $phone_number = Auth::user()->account->phone_number;
+
+        }
+        else {
+
+            $this->validate($request,[
+                "phone_number" => "required",
+            ]);
+
+            $phone_number = $request->input("phone_number");
+        }
+
+        if($amount < $min_purchase){
+
+            return redirect()->back()->with([
+                "error" => "Can not purchase airtime less than ". $min_purchase . ". Transaction declined."
+            ]);
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            $check_balance = Account::where("user_email", Auth::user()->email)
+                ->where("account_balance", ">", $amount)->lockForUpdate()
+                ->first();
+
+            if (!$check_balance) {
+
+                return redirect()->back()->with([
+                    "error" => "Insufficient Funds!, Transaction declined."
+                ]);
+            }
+
+            //Debit from account
+            $check_balance->account_balance = $check_balance->account_balance - $amount;
+            $check_balance->save();
+
+            //Add debit to transactions
+            Transaction::create([
+                "transaction_type" => "Debit",
+                "transaction_description" => "@Airtime Purchase / Debit / @" . $phone_number,
+                "transaction_amount" => $amount,
+                "account_id" => Auth::user()->account->id
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with([
+                "success" => "Transaction Successful!."
+            ]);
+
+        } catch (\Exception $e){
+
+            DB::rollBack();
+
+            throw $e;
+        }
+
     }
 }
