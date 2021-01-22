@@ -98,7 +98,7 @@ Larabank is built with Laravel Framework 8.18.1 which would require [PHP](https:
     cd larabank
    ```
 
-4. Install packages with composer
+4. Install packages with composer (Make sure composer is installed already)
     ```bash
     composer install
    ```
@@ -115,6 +115,7 @@ Larabank is built with Laravel Framework 8.18.1 which would require [PHP](https:
 
 7. Create an empty database and add the database credentials to `.env` file
     ```angular2html
+        DB_HOST=localhost
         DB_DATABASE=your_database_name
         DB_USERNAME=root
         DB_PASSWORD=your_password
