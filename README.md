@@ -70,8 +70,11 @@ Race conditions occur in split seconds, and this can cause a terrible glitch in 
         }
 ```
 
-The most important part of the code above is the `$check_balance` line where you chain the query with lockForUpdate(). This is where the pessimistic lock is applied on the database. Any other user trying to update that row would be blocked until the transaction commits successfully  or fails and rollback.
+The most important part of the code above is the `$check_balance` line where you chain the query with lockForUpdate(). This is where the pessimistic lock is applied on the database. Any other user trying to update that row would have to wait until the transaction commits successfully  or fails and rollback.
 
+Mysql uses InnoDB storage engine to implement row level locks  with the `SELECT ... FOR UPDATE` statement. 
+
+It's important to note that row level lock does not lock the whole table but only locks a particular row until transaction is completed. 
 ## Screen
 
 `Dashboard`
@@ -128,10 +131,12 @@ Larabank is built with Laravel Framework 8.18.1 which would require [PHP](https:
 
 10. open http://127.0.0.1:8000/ in your browser, You should see larabank login page.
 
+11. Create new account and login. You should create two separate accounts to enable you transfer funds from one account to another.
 ## Todo
 Project based learning is very effective in learning software development, if you are looking for a project to improve your skill regardless the technology, you can use this project as a starting point and improve on it. Here are some few things i feel can be added to make it awesome.
 - Implement two-factor authentication to enhance security
 - Implement API - create api endpoints for mobile app to consume.
+- Implement Cron job - Run a cron job to debit users maybe every month for sms alerts, You can also implement a job to send monthly account statement to users email.
 - Implement Password reset
 - Implement Account Activation on sign up.
 - Add beneficiaries - Enable bank user manage beneficiaries and only transfer to existing bank accounts.
