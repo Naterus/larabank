@@ -20,9 +20,9 @@ Race conditions occur in split seconds, and this can cause a terrible glitch in 
 
         try {
 
-            //Initiate exclusive lock for first user to access this record
+            //Initiate exclusive lock for first user to access this row
             $check_balance = Account::where("user_email", Auth::user()->email)
-                ->where("account_balance", ">=", $amount)
+                ->where("account_balance", ">=", $amount)->lockForUpdate()
                 ->first();
 
             if (!$check_balance) {

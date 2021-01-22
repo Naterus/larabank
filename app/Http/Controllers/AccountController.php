@@ -19,7 +19,6 @@ class AccountController extends Controller
             "account_name" => "required|string|min:6|max:80",
             "account_type" => "required",
             "phone_number" => "required|min:10|max:11",
-            "alternate_email" => "min:8",
         ]);
 
         Account::where("user_email",Auth::user()->email)->update([
@@ -77,9 +76,9 @@ class AccountController extends Controller
 
         try {
 
-            //Initiate exclusive lock for first user to access this record
+            //Initiate exclusive lock for first user to access this row
             $check_balance = Account::where("user_email", Auth::user()->email)
-                ->where("account_balance", ">=", $amount)
+                ->where("account_balance", ">=", $amount)->lockForUpdate()
                 ->first();
 
             if (!$check_balance) {
@@ -149,7 +148,7 @@ class AccountController extends Controller
         else {
 
             $this->validate($request,[
-                "phone_number" => "required",
+                "phone_number" => "required|min:10|max:11",
             ]);
 
             $phone_number = $request->input("phone_number");

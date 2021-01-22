@@ -6,6 +6,7 @@
             <div class="panel panel-default text-center">
                 <div class="panel-heading">Buy Airtime</div>
                 <div class="panel-body">
+                    <h3 class="text-info">Balance &#8358;{{ number_format(Auth::user()->account->account_balance) }}</h3>
                     @if(Session::has('error'))
                         <div class="alert alert-danger text-center">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
