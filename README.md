@@ -2,7 +2,7 @@
 
 <p align="center">
 
-<a href="https://github.com/Naterus/restful-countries/blob/main/LICENSE"><img src="https://restfulcountries.com/assets/images/license-mit.svg" alt="License"></a>
+<a href="https://github.com/Naterus/larabank/blob/main/LICENSE"><img src="https://restfulcountries.com/assets/images/license-mit.svg" alt="License"></a>
 </p>
 
 
