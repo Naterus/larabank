@@ -70,7 +70,7 @@ Race conditions occur in split seconds, and this can cause a terrible glitch in 
         }
 ```
 
-The most important part of the code above is the `$check_balance` line where you chain the query with lockForUpdate(). This is where the pessimistic lock is applied on the database. Any other user trying to update that row would have to wait until the transaction commits successfully  or fails and rollback.
+The most important part of the code above is the `$check_balance` line were you chain the query with lockForUpdate(). This is where the pessimistic lock is applied on the database. Any other user trying to update that row would have to wait until the transaction commits successfully  or fails and rollback.
 
 Mysql uses InnoDB storage engine to implement row level locks  with the `SELECT ... FOR UPDATE` statement. 
 
