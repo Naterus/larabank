@@ -12,6 +12,9 @@ class AuthTest extends TestCase
 
     public function testValidUserLogin()
     {
+        //Disable exception handling to get descriptive error messages
+        $this->withoutExceptionHandling();
+
         //Create test user from factory
         User::factory(1)->create();
 
@@ -25,8 +28,10 @@ class AuthTest extends TestCase
         $response->assertRedirect(route("account.dashboard"));
     }
 
-    public function testInValidUserLogin()
+    public function testInvalidUserLogin()
     {
+        //Disable exception handling to get descriptive error messages
+        $this->withoutExceptionHandling();
 
         $credentials = [
             "email" => "johndoe@gmail.com",
