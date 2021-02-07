@@ -35,6 +35,7 @@ class AuthTest extends TestCase
 
         $response = $this->post(route("login.attempt"),$credentials);
 
+        $response->assertRedirect(route("home"));
         $response->assertSessionHas("error");
     }
 }
