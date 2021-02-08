@@ -43,4 +43,24 @@ class AuthTest extends TestCase
         $response->assertRedirect(route("home"));
         $response->assertSessionHas("error");
     }
+
+    public function testUniqueEmailOnRegistration(){
+
+        //Create test user from factory
+        User::factory(1)->create();
+
+        $credentials = [
+            "email" => "test@gmail.com",
+            "password" => "111111",
+            "password_confirmation" => "111111",
+            "account_type" => "Savings",
+            "account_name" => "John Doe",
+            "phone_number" => "08133093344",
+        ];
+
+        $response = $this->post(route("register.submit"),$credentials);
+
+        $response->assertSessionHasErrors("email");
+
+    }
 }
