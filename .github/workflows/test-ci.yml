@@ -1,0 +1,34 @@
+name: Test Github Action
+
+on:
+
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Copy .env.example
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: Install packages
+        run: composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Generate Application Key
+        run: php artisan key:generate
+      - name: Directory Permission
+        run: chmod -R 777 storage bootstrap/cache
+      - name: Create Database
+        run: |
+           mkdir -p database
+           touch database/database.sqlite
+      - name: Execute tests (Unit and Feature tests) via PHPUnit
+        env:
+           DB_CONNECTION: sqlite
+           DB_DATABASE: database/database.sqlite
+        run: vendor/bin/phpunit
+        
+     
+     
